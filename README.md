@@ -30,7 +30,7 @@ mapa. Está pensada para estudiantes y personas que trabajan a distancia y busca
 | :---: | :---: | :---: | :---: |
 | <img src="docs/screen_meter.png" width="190" alt="Medidor" /> | <img src="docs/screen_measuring.png" width="190" alt="Medición en curso" /> | <img src="docs/screen_save.png" width="190" alt="Guardar lugar" /> | <img src="docs/screen_map.png" width="190" alt="Mapa de calma" /> |
 
-*Capturas tomadas en el emulador de Android Studio (Pixel 6, Android 14) con el micrófono del computador, en una habitación con ruido moderado.*
+*Capturas del emulador de Android Studio (Pixel 6, Android 14) con el micrófono del computador, en una habitación con ruido moderado.*
 
 ## 📲 Compatibilidad con Android
 
@@ -49,7 +49,7 @@ mapa. Está pensada para estudiantes y personas que trabajan a distancia y busca
 | Dispositivo | Android | Resultado |
 |---|---|---|
 | Emulador Pixel 6 (x86_64, Google APIs) | 14 (API 34) | ✅ Permisos, medición con micrófono real, guardado con ubicación y mapa |
-| Teléfono físico | — | Pendiente |
+| **Redmi 15C** (arm64, Mali-G52) | **16 (API 36)** | ✅ Instalación, permisos, micrófono real, medición de 10 s, guardado con GPS y mapa |
 
 ## ✨ Características
 
@@ -135,10 +135,14 @@ Ese valor se limita al rango 0–120 dB.
 ## 🚀 Cómo ejecutar el proyecto
 
 ### Instalar el APK
-1. Descarga `SoundMap-1.0.0-debug.apk` desde [Releases](https://github.com/jsanhuezamolina-ai/app_sound_map/releases/latest).
+1. Descarga el APK más reciente (`SoundMap-<versión>-debug.apk`) desde [Releases](https://github.com/jsanhuezamolina-ai/app_sound_map/releases/latest).
 2. Ábrelo en el teléfono y permite **instalar apps de origen desconocido**.
 
-También puedes instalarlo por USB: `adb install -r SoundMap-1.0.0-debug.apk`.
+También puedes instalarlo por USB: `adb install -r SoundMap-1.0.1-debug.apk`.
+
+> **Teléfonos Xiaomi / Redmi / POCO:** `adb install` falla con `INSTALL_FAILED_USER_RESTRICTED` si no está activada
+> **Opciones de desarrollador → Instalar vía USB** (pide cuenta Mi). Alternativa: copia el APK a Descargas
+> (`adb push SoundMap-1.0.1-debug.apk /sdcard/Download/`) e instálalo desde el Administrador de archivos.
 
 ### Compilar desde el código
 1. Clona el repositorio:
@@ -173,7 +177,7 @@ Desde la terminal (JDK 17 o superior):
 ## 📝 Notas
 
 - El APK publicado es de **depuración**, firmado con la clave de depuración. Para Google Play hace falta una clave propia.
-- Paquete: `com.jonathan.soundmap` · versión 1.0.0 (código 1).
+- Paquete: `com.jonathan.soundmap` · versión 1.0.1 (código 2).
 - La especificación original del proyecto está en [`docs/especificacion_original.md`](docs/especificacion_original.md).
 - Historial de cambios: [CHANGELOG.md](CHANGELOG.md).
 

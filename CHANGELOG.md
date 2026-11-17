@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1] - 2026-11-16
+
+### Corregido
+- El mapa quedaba en gris cuando los lugares guardados estaban a pocos metros entre sí: el encuadre
+  superaba el zoom 19, el máximo con teselas de OpenStreetMap. Ahora el zoom tiene ese tope y los lugares
+  muy cercanos se centran a nivel de calle (zoom 17).
+
+### Probado
+- Teléfono físico Redmi 15C con Android 16 (API 36).
+
 ## [1.0.0] - 2026-11-16
 
 ### Añadido

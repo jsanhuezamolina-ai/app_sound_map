@@ -69,6 +69,15 @@ import kotlin.math.roundToInt
 /** Centro inicial cuando aún no hay lugares guardados: Santiago de Chile. */
 private val DEFAULT_CENTER = GeoPoint(-33.4489, -70.6693)
 
+/** Zoom máximo con teselas de OpenStreetMap (Mapnik). */
+private const val MAX_ZOOM = 19.0
+
+/** Zoom al centrar uno o varios lugares muy cercanos (nivel de calle). */
+private const val FOCUS_ZOOM = 17.0
+
+/** Bajo este tamaño (~200 m) el encuadre se hace por centro y no por bounding box. */
+private const val MIN_SPAN_DEG = 0.002
+
 @Composable
 fun MapHistoryScreen(viewModel: MapHistoryViewModel, modifier: Modifier = Modifier) {
     val spots by viewModel.spots.collectAsStateWithLifecycle()
@@ -165,6 +174,9 @@ private fun NoiseMap(spots: List<NoiseSpot>, selectedId: Long?, onMarkerClick: (
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
+            // OpenStreetMap no tiene teselas sobre el nivel 19: más allá solo se verían cuadros grises.
+            minZoomLevel = 3.0
+            maxZoomLevel = MAX_ZOOM
             controller.setZoom(12.0)
             controller.setCenter(DEFAULT_CENTER)
             // Atribución obligatoria según la política de uso de las teselas de OpenStreetMap.
@@ -189,21 +201,24 @@ private fun NoiseMap(spots: List<NoiseSpot>, selectedId: Long?, onMarkerClick: (
 
     // Encuadra todos los lugares cuando cambia la lista.
     LaunchedEffect(spots.map { it.id }) {
-        when {
-            spots.size == 1 -> {
-                mapView.controller.setZoom(16.0)
-                mapView.controller.setCenter(GeoPoint(spots[0].latitude, spots[0].longitude))
-            }
-            spots.size > 1 -> mapView.post {
-                val box = BoundingBox.fromGeoPointsSafe(spots.map { GeoPoint(it.latitude, it.longitude) })
+        if (spots.isEmpty()) return@LaunchedEffect
+        val points = spots.map { GeoPoint(it.latitude, it.longitude) }
+        val box = BoundingBox.fromGeoPointsSafe(points)
+        if (spots.size == 1 || (box.latitudeSpan < MIN_SPAN_DEG && box.longitudeSpanWithDateLine < MIN_SPAN_DEG)) {
+            // Un lugar, o varios a pocos metros (por ejemplo, dos piezas de la misma casa).
+            mapView.controller.setZoom(FOCUS_ZOOM)
+            mapView.controller.setCenter(box.centerWithDateLine)
+        } else {
+            mapView.post {
                 mapView.zoomToBoundingBox(box.increaseByScale(1.4f), false, 64)
+                if (mapView.zoomLevelDouble > FOCUS_ZOOM) mapView.controller.setZoom(FOCUS_ZOOM)
             }
         }
     }
 
     LaunchedEffect(selectedId) {
         spots.firstOrNull { it.id == selectedId }?.let {
-            mapView.controller.animateTo(GeoPoint(it.latitude, it.longitude), 17.0, 600L)
+            mapView.controller.animateTo(GeoPoint(it.latitude, it.longitude), FOCUS_ZOOM, 600L)
         }
     }
 
